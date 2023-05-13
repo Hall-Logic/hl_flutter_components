@@ -13,6 +13,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   url_launcher: ^6.1.9
   smooth_page_indicator: ^1.1.0
+  jumping_dot: ^0.0.6
+  animations: ^2.0.7
+
 
 
 dev_dependencies:

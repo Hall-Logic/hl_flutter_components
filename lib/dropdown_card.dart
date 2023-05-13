@@ -1,4 +1,5 @@
 //card with an arrow on right side to expand to see full card contents
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 
 class CustomCardStyle {
@@ -44,38 +45,55 @@ class _DropdownCardState extends State<DropdownCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: show
-          //show full card
-          ? Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  CustomCardStyle.borderRadius,
-                ),
-              ),
-              color: CustomCardStyle.backgroundColor,
-              child: Column(
-                children: [
-                  CardTitle(context),
-                  widget.child,
-                ],
-              ),
-            )
-          : Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  CustomCardStyle.borderRadius,
-                ),
-                // side: BorderSide(
-                //   color: CustomCardStyle.borderColor,
-                //   width: CustomCardStyle.borderWidth,
-                // ),
-              ),
-              color: CustomCardStyle.backgroundColor,
-              child: CardTitle(context),
+    return OpenContainer(
+      transitionDuration: Duration(milliseconds: 500),
+      closedColor: CustomCardStyle.backgroundColor,
+      openColor: CustomCardStyle.backgroundColor,
+      closedElevation: 5,
+      openElevation: 5,
+      closedBuilder: (context, openContainer) {
+        return Card(
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              CustomCardStyle.borderRadius,
             ),
+          ),
+          color: CustomCardStyle.backgroundColor,
+          child: ListTile(
+            onTap: openContainer,
+            title: Text(
+              widget.title,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              widget.subtitle,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.secondary,
+                fontWeight: FontWeight.bold,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            trailing: const Icon(Icons.arrow_drop_down),
+          ),
+        );
+      },
+      openBuilder: (context, closeContainer) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: closeContainer,
+            ),
+          ),
+          body: widget.child,
+        );
+      },
     );
   }
 

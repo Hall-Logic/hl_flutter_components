@@ -1,5 +1,4 @@
 //card with an arrow on right side to expand to see full card contents
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 
 class CustomCardStyle {
@@ -34,66 +33,60 @@ class DropdownCard extends StatefulWidget {
   _DropdownCardState createState() => _DropdownCardState();
 }
 
-class _DropdownCardState extends State<DropdownCard> {
+class _DropdownCardState extends State<DropdownCard>
+    with SingleTickerProviderStateMixin {
   bool show = false;
+  late AnimationController _animationController;
+  late Animation<double> _sizeAnimation;
+  late Animation<double> _arrowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _sizeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    _arrowAnimation = Tween(begin: 0.0, end: 0.5).animate(_sizeAnimation);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   void toggleShow() {
     setState(() {
       show = !show;
+      show ? _animationController.forward() : _animationController.reverse();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return OpenContainer(
-      transitionDuration: Duration(milliseconds: 500),
-      closedColor: CustomCardStyle.backgroundColor,
-      openColor: CustomCardStyle.backgroundColor,
-      closedElevation: 5,
-      openElevation: 5,
-      closedBuilder: (context, openContainer) {
-        return Card(
-          elevation: 5,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              CustomCardStyle.borderRadius,
-            ),
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+          CustomCardStyle.borderRadius,
+        ),
+      ),
+      color: CustomCardStyle.backgroundColor,
+      child: Column(
+        children: [
+          CardTitle(context),
+          SizeTransition(
+            sizeFactor: _sizeAnimation,
+            axisAlignment: 0.0,
+            child: widget.child,
           ),
-          color: CustomCardStyle.backgroundColor,
-          child: ListTile(
-            onTap: openContainer,
-            title: Text(
-              widget.title,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(
-              widget.subtitle,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.secondary,
-                fontWeight: FontWeight.bold,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            trailing: const Icon(Icons.arrow_drop_down),
-          ),
-        );
-      },
-      openBuilder: (context, closeContainer) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(widget.title),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: closeContainer,
-            ),
-          ),
-          body: widget.child,
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -116,8 +109,10 @@ class _DropdownCardState extends State<DropdownCard> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              trailing:
-                  Icon(show ? Icons.arrow_drop_up : Icons.arrow_drop_down),
+              trailing: RotationTransition(
+                turns: _arrowAnimation,
+                child: const Icon(Icons.arrow_drop_down),
+              ),
             ),
             Row(
               children: [

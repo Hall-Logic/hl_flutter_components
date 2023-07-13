@@ -114,19 +114,21 @@ class _DropdownCardState extends State<DropdownCard>
                 child: const Icon(Icons.arrow_drop_down),
               ),
             ),
-            Row(
-              children: [
-                const SizedBox(width: 16),
-                Text(
-                  widget.subtitle,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
-                    fontWeight: FontWeight.bold,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
+            widget.subtitle.isNotEmpty
+                ? Row(
+                    children: [
+                      const SizedBox(width: 16),
+                      Text(
+                        widget.subtitle,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary,
+                          fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(),
           ],
         ),
       ),
